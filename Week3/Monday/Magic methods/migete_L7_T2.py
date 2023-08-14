@@ -21,6 +21,7 @@ maze = [
 ]
 maze[3][16] = 7
 
+
 # initializes grid
 def init_maze ( l ,w):
     maze = [ [ 1] * l for i in range (w) ]
@@ -28,6 +29,7 @@ def init_maze ( l ,w):
         for j in range(1, l-1, 2):
            maze[i][j] = 9
     return maze
+
 
 # creates random maze from grid
 def walk(maze, x, y) :
@@ -39,6 +41,7 @@ def walk(maze, x, y) :
             if maze [ newX ] [ newY ] == 9:
                 maze [ ( newX + x ) // 2 ] [ ( newY + y ) // 2 ] = 0
                 walk (maze , newX , newY )
+
 
 # sets a target in a random maze
 def setGold(maze):
@@ -79,6 +82,7 @@ def solveMazeRecursive(maze, x, y):
     maze[x][y] = 5
     return False
 
+
 #print function
 def printMaze(maze):
     for row in maze:
@@ -96,57 +100,65 @@ def printMaze(maze):
         print('')
 
 
-
 def solveMaze(x, y):
+    #stores all legal moves
     moves = [(x,y)]
+
+    #stores all visited cells
     visited = []
+
+    #stores the cells that are intersections
     intersections=[]
 
+    #iterates through moves and ques new ones
     while moves:
         x, y = moves.pop()
         visited.append((x,y))
-
-
-
 
         if maze[x][y] == 0:
             maze[x][y] = 3
 
         neighbours = [(x + 1, y), (x, y + 1), (x - 1, y), (x, y - 1)]
-        hasNeighbours = False
-        counter = 0
-        for newX, newY in neighbours:
 
+        #counter for number of valid neighbours
+        counter = 0
+
+        for newX, newY in neighbours:
+            #checks if the neighbours are valid
             if newX in range(1, len(maze) - 1) and newY in range(1, len(maze[0]) - 1) and (maze[newX][newY] == 0 or maze[newX][newY] == 7):
+                                #if the neighbour is the target it ends
                 if maze[newX][newY] == 7:
                     return True
+
+                #it marks valid neighbours as possible moves
                 moves.append((newX,newY))
 
-                hasNeighbours = True
-
                 counter += 1
+                                #if there are more than 1 valid neighbours the cell is an intersection
                 if counter > 1:
                     intersections.append((x,y))
 
+        #if there are no valid neighbour we either went to a corner or reached a path we alreade passed through
+        if counter == 0:
 
-        if hasNeighbours == False:
-            ended = False
+            endedDeleting = False
 
-            while not ended:
-
+            while not endedDeleting:
+#mark all visited cells until the last intersection as not leading to the target
                 while visited[-1] != intersections[-1]:
                     x_pop, y_pop = visited.pop()
                     maze[x_pop][y_pop] = 5
 
+#checks if the intersection has valid neighbours or not
                 x, y = intersections.pop()
                 tmp_neighbours = [(x + 1, y), (x, y + 1), (x - 1, y), (x, y - 1)]
 
                 for newX, newY in tmp_neighbours:
-                    #print("newX: ", newX, "newY: ", newY)
+                    # if it has it puts it back into intersections list
+                    #else it is deleted and the process of marking invalid path is repeated
                     if maze[newX][newY] == 0:
-                        # has valid neighbour
                         intersections.append((x, y))
-                        ended = True
+                        endedDeleting = True
 
     return False
 
